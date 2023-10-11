@@ -1,0 +1,32 @@
+name: 'Boost GraphQL GitHub Action'
+description: 'Boost GraphQL GitHub Action'
+inputs:
+  api_token:
+    required: true
+  api_endpoint:
+    default: 'https://api.boostsecurity.io'
+  asset:
+    required: false
+  query:
+    required: false
+    default: asset_metadata
+outputs:
+  attributes:
+    description: "Boost Asset Attributes JSON"
+    value: ${{ steps.script.outputs.attributes }}
+runs:
+  using: "composite"
+  steps:
+    - name: Script
+      id: script
+      uses: actions/github-script@00f12e3e20659f42342b1c0226afda7f7c042325 # v6
+      env:
+        SCRIPT_PATH: ${{ github.action_path }}/src/index.js
+        INPUT_API_ENDPOINT: ${{ inputs.api_endpoint }}
+        INPUT_API_TOKEN: ${{ inputs.api_token }}
+        INPUT_ASSET: ${{ inputs.asset }}
+        INPUT_QUERY: ${{ inputs.query }}
+      with:
+        script: |
+          const {SCRIPT_PATH} = process.env;
+          await require(SCRIPT_PATH)({ core, fetch, github, context })
